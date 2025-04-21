@@ -236,8 +236,10 @@ function highlightActiveLink() {
         //check for movie-details.html in pathname -> highlight Movies Link
 
         if (
-            (global.currentPage.includes('index.html') || global.currentPage.includes('movie-details.html')) &&
-            hrefValue.includes('index.html')
+            (global.currentPage == '/' ||
+                global.currentPage.includes('/index') ||
+                global.currentPage.includes('/movie-details')) &&
+            (hrefValue == 'index.html' || hrefValue == '/')
         ) {
             link.classList.add('active');
             return;
@@ -246,8 +248,8 @@ function highlightActiveLink() {
         //check for tv-details.html in pathname to highlight TV Shows link
 
         if (
-            (global.currentPage.includes('shows.html') || global.currentPage.includes('tv-details.html')) &&
-            hrefValue.includes('shows.html')
+            (global.currentPage.includes('/shows') || global.currentPage.includes('/tv-details')) &&
+            (hrefValue == 'shows.html' || hrefValue == '/shows')
         ) {
             link.classList.add('active');
             return;
@@ -264,22 +266,31 @@ function init() {
     switch (global.currentPage) {
         case '/':
         case '/index.html':
+            console.log(global.currentPage);
             displayPopularMovies();
             highlightActiveLink();
             break;
+        case '/shows':
         case '/shows.html':
+            console.log(global.currentPage);
             displayPopularShows();
             highlightActiveLink();
             break;
+        case '/movie-details':
         case '/movie-details.html':
+            console.log(global.currentPage);
             displayMovieDetails();
             highlightActiveLink();
             break;
+        case '/tv-details':
         case '/tv-details.html':
+            console.log(global.currentPage);
             displayShowDetails();
             highlightActiveLink();
             break;
+        case '/search':
         case '/search.html':
+            console.log(global.currentPage);
             console.log('Search');
             break;
     }
