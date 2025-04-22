@@ -1,5 +1,9 @@
 const global = {
     currentPage: window.location.pathname,
+    search: {
+        page: 1,
+        totalPages: 1,
+    },
 };
 
 // Fetch data from TMDB API
@@ -17,13 +21,13 @@ async function fetchAPIData(endpoint) {
     return data;
 }
 
-async function fetchAPIDataSearch(endpoint, query) {
+async function fetchAPIDataSearch(endpoint, query, page) {
     const API_KEY = '51ba5c4b471cbd1100c85683c2e71d77';
     const API_URL = 'https://api.themoviedb.org/3/';
 
     showSpinner();
 
-    const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US&query=${query}`);
+    const response = await fetch(`${API_URL}${endpoint}?api_key=${API_KEY}&language=en-US&query=${query}&page=${page}`);
 
     const data = await response.json();
 
@@ -232,17 +236,24 @@ async function displayShowDetails() {
     document.querySelector('#show-details').appendChild(div);
 }
 
-async function displaySearchResults() {
+async function displaySearchResults(page = 1) {
     const searchTerm = window.location.search.split('&')[1].split('=')[1];
     const searchType = window.location.search.split('&')[0].split('=')[1];
 
-    const { results } = await fetchAPIDataSearch(`search/${searchType}`, searchTerm);
+    const results = await fetchAPIDataSearch(`search/${searchType}`, searchTerm, page);
+
+    global.search.page = results.page;
+    global.search.totalPages = results.total_pages;
+    // console.log(global.search.totalPages);
 
     document.querySelector(`#radio-bt-${searchType}`).setAttribute('checked', '');
     document.querySelector('#search-term').value = searchTerm.split('+').join(' ');
 
-    results.forEach((result) => {
+    document.querySelector('#search-results').innerHTML = '';
+
+    results.results.map((result) => {
         const div = document.createElement('div');
+
         div.classList.add('card');
 
         div.innerHTML = `
@@ -270,6 +281,31 @@ async function displaySearchResults() {
                     </div> `;
 
         document.querySelector('#search-results').appendChild(div);
+    });
+
+    pagination();
+}
+
+function pagination() {
+    console.log(global.search.totalPages);
+    document.querySelector(
+        '.pagination'
+    ).innerHTML = `                    <button class="btn btn-primary" id="prev">Prev</button>
+          <button class="btn btn-primary" id="next">Next</button>
+          <div class="page-counter">Page ${global.search.page} of ${global.search.totalPages}</div>`;
+
+    const prev = document.querySelector('#prev');
+    const next = document.querySelector('#next');
+    const currentPage = global.search.page;
+
+    prev.addEventListener('click', async () => {
+        global.search.page > 1 ? global.search.page : global.search.page--;
+        displaySearchResults(global.search.page);
+    });
+
+    next.addEventListener('click', async () => {
+        global.search.page++;
+        displaySearchResults(global.search.page);
     });
 }
 
@@ -322,27 +358,22 @@ function init() {
         case '/':
         case '/index.html':
             displayPopularMovies();
-            highlightActiveLink();
             break;
         case '/shows':
         case '/shows.html':
             displayPopularShows();
-            highlightActiveLink();
             break;
         case '/movie-details':
         case '/movie-details.html':
             displayMovieDetails();
-            highlightActiveLink();
             break;
         case '/tv-details':
         case '/tv-details.html':
             displayShowDetails();
-            highlightActiveLink();
             break;
         case '/search':
         case '/search.html':
             displaySearchResults();
-            highlightActiveLink();
             break;
     }
     highlightActiveLink();
