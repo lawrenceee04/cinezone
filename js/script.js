@@ -236,16 +236,21 @@ async function displayShowDetails() {
     document.querySelector('#show-details').appendChild(div);
 }
 
-async function displaySearchResults(page = 1) {
+async function displaySearchResults(page = 1, prev = false) {
     const searchTerm = window.location.search.split('&')[1].split('=')[1];
     const searchType = window.location.search.split('&')[0].split('=')[1];
+    const searchPage = window.location.search.split('&')[2].split('=')[1];
 
-    const results = await fetchAPIDataSearch(`search/${searchType}`, searchTerm, page);
+    const results = await fetchAPIDataSearch(
+        `search/${searchType}`,
+        searchTerm,
+        page > searchPage || prev ? page : searchPage
+    );
 
     global.search.page = results.page;
     global.search.totalPages = results.total_pages;
-    // console.log(global.search.totalPages);
 
+    document.querySelector('#search-results-term').innerHTML = `Search results for ${searchTerm.split('+').join(' ')}`;
     document.querySelector(`#radio-bt-${searchType}`).setAttribute('checked', '');
     document.querySelector('#search-term').value = searchTerm.split('+').join(' ');
 
@@ -257,7 +262,7 @@ async function displaySearchResults(page = 1) {
         div.classList.add('card');
 
         div.innerHTML = `
-                    <a href="#">
+                    <a href="${searchType == 'movie' ? 'movie-details.html?id=' : 'tv-details.html?id='}${result.id}">
                     ${
                         result.poster_path
                             ? `<img src="https://image.tmdb.org/t/p/w500${result.poster_path}"
@@ -295,12 +300,18 @@ function pagination() {
           <div class="page-counter">Page ${global.search.page} of ${global.search.totalPages}</div>`;
 
     const prev = document.querySelector('#prev');
+    // Disable prev button
+    global.search.page == 1 ? prev.setAttribute('disabled', '') : prev;
+
     const next = document.querySelector('#next');
+    // Disable next button
+    global.search.page == global.search.totalPages ? next.setAttribute('disabled', '') : next;
+
     const currentPage = global.search.page;
 
     prev.addEventListener('click', async () => {
         global.search.page > 1 ? global.search.page-- : global.search.page;
-        displaySearchResults(global.search.page);
+        displaySearchResults(global.search.page, true);
     });
 
     next.addEventListener('click', async () => {

@@ -43,6 +43,7 @@
                     </div>
                     <div class="search-flex">
                         <input type="text" name="search-term" id="search-term" placeholder="Enter search term" />
+                        <input type="hidden" name="page" id="page" value="1" />
                         <button class="btn" type="submit">
                             <i class="fas fa-search"></i>
                         </button>
@@ -53,7 +54,9 @@
 
         <!-- Search Results -->
         <section id="search-results-wrapper" class="container">
-            <heading id="search-results-heading"></heading>
+            <heading id="search-results-heading">
+                <h2 id="search-results-term"></h2>
+            </heading>
             <div id="search-results" class="grid"></div>
             <div id="pagination">
                 <div class="pagination"></div>
