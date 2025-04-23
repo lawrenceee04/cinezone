@@ -299,7 +299,7 @@ function pagination() {
     const currentPage = global.search.page;
 
     prev.addEventListener('click', async () => {
-        global.search.page > 1 ? global.search.page : global.search.page--;
+        global.search.page > 1 ? global.search.page-- : global.search.page;
         displaySearchResults(global.search.page);
     });
 
@@ -352,11 +352,75 @@ function highlightActiveLink() {
     });
 }
 
+// Swiper JS
+async function showNowPlaying() {
+    const { results } = await fetchAPIData('movie/popular');
+
+    results.forEach((movie) => {
+        const div = document.createElement('div');
+        div.classList.add('swiper-slide');
+        div.innerHTML = `
+          <a href="movie-details.html?id=${movie.id}">
+            <img
+              src="${
+                  (movie.poster_path || './images/no-image.jpg') == movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                      : './images/no-image.jpg'
+              }"
+              alt="${movie.title}"
+            />
+          </a>
+          <h4 class="swiper-rating">
+            <i class="fas fa-star text-secondary"></i> ${movie.vote_average} / 10
+          </h4>
+        `;
+        document.querySelector('.swiper-wrapper').appendChild(div);
+    });
+    swiperNoSwipingHAHAHA();
+}
+
+function swiperNoSwipingHAHAHA() {
+    const swiper = new Swiper('.swiper', {
+        freeMode: {
+            enabled: true,
+            sticky: true,
+        },
+        effect: 'coverflow',
+        coverflowEffect: {
+            rotate: 30,
+            slideShadows: true,
+            modifier: 5,
+        },
+        slidesPerView: 1,
+        breakpoints: {
+            350: {
+                slidesPerView: 1,
+                spaceBetween: 15,
+            },
+            600: {
+                slidesPerView: 3,
+                spaceBetween: 25,
+            },
+            1000: {
+                slidesPerView: 5,
+                spaceBetween: 40,
+            },
+        },
+        spaceBetween: 40,
+        direction: 'horizontal',
+        loop: true,
+        autoplay: {
+            delay: 2000,
+            disableOnInteraction: false,
+        },
+    });
+}
 // Init App
 function init() {
     switch (global.currentPage) {
         case '/':
         case '/index.html':
+            showNowPlaying();
             displayPopularMovies();
             break;
         case '/shows':
