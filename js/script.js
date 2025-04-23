@@ -382,7 +382,7 @@ async function showNowPlaying() {
             />
           </a>
           <h4 class="swiper-rating">
-            <i class="fas fa-star text-secondary"></i> ${movie.vote_average} / 10
+            <i class="fas fa-star text-secondary"></i> ${movie.vote_average.toFixed(2)} / 10
           </h4>
         `;
         document.querySelector('.swiper-wrapper').appendChild(div);
